@@ -1,27 +1,22 @@
-const fs = require('fs');
-const path = require('path');
-const { Octokit } = require('@octokit/rest');
+import fs from 'fs';
+import path from 'path';
+import { Octokit } from '@octokit/rest';
 
-
-// Load environment variables from action inputs
 const GITHUB_TOKEN = process.env.INPUT_TOKEN;
 const REPO_NAME = process.env.INPUT_REPOSITORY;
 const PR_NUMBER = process.env.INPUT_PULL_REQUEST_NUMBER;
 const SARIF_PATH = process.env.INPUT_SARIF_PATH || 'codeguru-security-results.sarif.json';
 const COMMIT_SHA = process.env.INPUT_INITIAL_COMMIT_SHA;
 
-// Initialize Octokit with your GitHub token
 const octokit = new Octokit({
   auth: GITHUB_TOKEN
 });
 
-// Load the SARIF results
 const sarifPath = path.join(process.cwd(), SARIF_PATH);
 const sarifData = JSON.parse(fs.readFileSync(sarifPath, 'utf8'));
 
 console.log("SARIF data loaded successfully");
 
-// Parse the SARIF results and create comments
 const comments = sarifData.runs[0].results.map(result => {
   const filePath = result.locations[0].physicalLocation.artifactLocation.uri;
   const lineNumber = result.locations[0].physicalLocation.region.startLine;
@@ -46,7 +41,6 @@ const fetchExistingComments = async () => {
     pull_number: PR_NUMBER,
   });
 
-  // Create a JSON object with filePath as keys and line numbers as nested keys
   const commentMap = {};
   existingComments.forEach(comment => {
     const filePath = comment.path;
@@ -55,7 +49,7 @@ const fetchExistingComments = async () => {
       if (!commentMap[filePath]) {
         commentMap[filePath] = {};
       }
-      commentMap[filePath][line] = true; // Just mark that this line has a comment
+      commentMap[filePath][line] = true;
     }
   });
 
@@ -74,7 +68,7 @@ const createReview = async () => {
 
       if (existingComments[filePath] && existingComments[filePath][line]) {
         console.log(`Skipping duplicate comment on ${filePath} at line ${line}`);
-        return Promise.resolve(); // skip if duplicate
+        return Promise.resolve(); 
       }
 
       return octokit.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/reviews', {
