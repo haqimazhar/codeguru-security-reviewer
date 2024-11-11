@@ -1,6 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import { Octokit } from '@octokit/rest';
+const fs = require('fs');
+const path = require('path');
+const { Octokit } = require('@octokit/rest');
+
 
 // Load environment variables from action inputs
 const GITHUB_TOKEN = process.env.INPUT_TOKEN;
