@@ -30,45 +30,10 @@ In your GitHub workflow file, add this step to comment on the PR based on the SA
 
 ```yaml
 - name: CodeGuru Security Reviewer
-  uses: <owner>/<repo>@<version>
+  uses: haqimazhar/codeguru-security-reviewer@v1
   with:
     token: ${{ secrets.GITHUB_TOKEN }}
     repository: ${{ github.repository }}
     pull_request_number: ${{ github.event.pull_request.number }}
     sarif_path: codeguru-security-results.sarif.json
     initial_commit_sha: ${{ github.event.pull_request.head.sha }}
-
-
-# 📚 Example Workflow
-
-Here's an example workflow using `aws-actions/codeguru-security` to run a security scan and then `codeguru-security-reviewer` to comment on the PR with the results:
-
-```yaml
-name: CodeGuru Security Scan 🔒
-
-on:
-  pull_request:
-    branches:
-      - 'main'
-
-jobs:
-  scan-and-comment:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code 📂
-        uses: actions/checkout@v2
-
-      - name: Run CodeGuru Security Scan 🔍
-        uses: aws-actions/codeguru-security@v1
-        with:
-          source_path: .
-          aws_region: us-west-2
-
-      - name: CodeGuru Security Reviewer 💬
-        uses: <owner>/codeguru-security-reviewer@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          pull_request_number: ${{ github.event.pull_request.number }}
-          sarif_path: codeguru-security-results.sarif.json
-          initial_commit_sha: ${{ github.event.pull_request.head.sha }}
